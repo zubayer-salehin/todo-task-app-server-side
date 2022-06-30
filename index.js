@@ -9,7 +9,7 @@ app.use(express.json())
 app.use(cors())
 
 app.get('/', (req, res) => {
-    res.send('Google Task App Server Side')
+    res.send('Todo Task App Server Side')
 })
 
 
@@ -21,25 +21,30 @@ async function run() {
     try {
 
         await client.connect();
+        // Collection
         const taskCollection = client.db("todo").collection("tasks");
         const completeTaskCollection = client.db("todo").collection("completeTask");
 
+        // get AllTask
         app.get("/allTask", async (req, res) => {
             const result = await taskCollection.find().toArray();
             res.send(result);
         })
 
+        // get AllCompleteTask
         app.get("/allCompleteTask", async (req, res) => {
             const result = await completeTaskCollection.find().toArray();
             res.send(result);
         })
 
+        // insert Task
         app.post("/addTask", async (req, res) => {
             const task = req.body;
             const result = await taskCollection.insertOne(task);
             res.send({ success: true, result });
         })
 
+        // insert CompleteTask
         app.post("/completeTask", async (req, res) => {
             const task = req.body.task;
             const completeTask = { task: task }
@@ -47,6 +52,7 @@ async function run() {
             res.send({ success: true, result });
         })
 
+        // Delete Task
         app.delete("/deleteTask/:id", async (req, res) => {
             const id = req.params.id;
             const query = { _id: ObjectId(id) }
@@ -54,6 +60,7 @@ async function run() {
             res.send(result);
         })
 
+        // Delte CompleteTask
         app.delete("/deleteCompleteTask/:id", async (req, res) => {
             const id = req.params.id;
             const query = { _id: ObjectId(id) }
@@ -61,6 +68,7 @@ async function run() {
             res.send(result);
         })
 
+        // Updated Task
         app.put("/taskEdit/:id", async (req, res) => {
             const id = req.params.id;
             const editTask = req.body
